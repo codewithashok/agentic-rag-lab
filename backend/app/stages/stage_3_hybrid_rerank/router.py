@@ -65,11 +65,11 @@ def sparse_search(query: str, corpus: List[str], top_k: int = 4) -> List[Tuple[s
     ranked_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
     return [(corpus[i], rank + 1) for rank, i in enumerate(ranked_indices) if scores[i] > 0]
 
-# Just 
+
 def reciprocal_rank_fusion(
     dense_results: List[Tuple[str, int]],
     sparse_results: List[Tuple[str, int]],
-    k: int = 60 # RRF parameter, 60 means, "the rank is divided by 60, so the higher the rank, the lower the score, and the lower the rank, the higher the score."
+    k: int = 60 # score = 1 / (k + rank). Large k keeps ranks close, so chunks found by BOTH searches win.
 ) -> List[str]:
     """
     Combines dense and sparse search rankings using RRF:
