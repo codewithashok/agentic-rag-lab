@@ -9,6 +9,7 @@ load_dotenv()
 # Import the Stage 0 router
 from app.stages.stage_0_baseline.router import router as stage_0_router
 from app.stages.stage_1_in_memory.router import router as stage_1_router
+from app.stages.stage_2_vector_db.router import router as stage_2_router
 
 app = FastAPI(
     title="Agentic RAG Lab API",
@@ -29,11 +30,13 @@ app.add_middleware(
 app.include_router(stage_0_router, prefix="/api")
 # Mount Stage 1 under the /api prefix -> /api/stage-1/chat
 app.include_router(stage_1_router, prefix="/api")
+# Mount Stage 2 under the /api prefix -> /api/stage-2/chat
+app.include_router(stage_2_router, prefix="/api")
 
 # Health check endpoint
 @app.get("/")
 def health_check():
     return {
         "status": "online",
-        "active_stages": ["/api/stage-0/chat", "/api/stage-1/chat"]
+        "active_stages": ["/api/stage-0/chat", "/api/stage-1/chat", "/api/stage-2/chat"]
     }

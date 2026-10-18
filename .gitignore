@@ -237,3 +237,6 @@ yarn-error.log*
 .vscode/
 .idea/
 .DS_Store
+
+# ChromaDB local vector store (rebuild with the Stage 2 indexer)
+backend/chroma_data/

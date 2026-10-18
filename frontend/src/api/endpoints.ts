@@ -34,7 +34,15 @@ export const STAGES: Stage[] = [
     description:
       'The whole shipping_policy.txt is pasted into the system prompt with strict "answer only from the policy" rules (gpt-4o-mini, temperature 0.0). Every question pays for the full document.',
   },
-  { id: 'stage-2', number: 2, label: 'Vector DB', concept: 'ChromaDB + embeddings', description: 'Top-K chunk retrieval.' },
+  {
+    id: 'stage-2',
+    number: 2,
+    label: 'Vector DB',
+    concept: 'ChromaDB + embeddings',
+    path: '/stage-2/chat',
+    description:
+      'The question is embedded (text-embedding-3-small), ChromaDB returns the top-2 matching policy chunks, and only those go into the prompt (gpt-4o-mini, temperature 0.0). Fewer tokens than Stage 1.',
+  },
   { id: 'stage-3', number: 3, label: 'Advanced RAG', concept: 'Hybrid search + rerank', description: 'BM25 + dense + cross-encoder.' },
   { id: 'stage-4', number: 4, label: 'Guardrails', concept: 'Input / output checks', description: 'PII masking, injection defense, RAG triad.' },
   { id: 'stage-5', number: 5, label: 'Tool Agent', concept: 'Function calling', description: 'Dynamic tool routing.' },
