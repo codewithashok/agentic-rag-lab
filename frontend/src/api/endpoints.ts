@@ -43,7 +43,15 @@ export const STAGES: Stage[] = [
     description:
       'The question is embedded (text-embedding-3-small), ChromaDB returns the top-2 matching policy chunks, and only those go into the prompt (gpt-4o-mini, temperature 0.0). Fewer tokens than Stage 1.',
   },
-  { id: 'stage-3', number: 3, label: 'Advanced RAG', concept: 'Hybrid search + rerank', description: 'BM25 + dense + cross-encoder.' },
+  {
+    id: 'stage-3',
+    number: 3,
+    label: 'Hybrid + Rerank',
+    concept: 'BM25 + vectors + RRF',
+    path: '/stage-3/chat',
+    description:
+      'Two searches run together: ChromaDB (meaning) and BM25 (exact keywords), top-4 each. Reciprocal Rank Fusion merges them, then a gpt-4o-mini reranker picks the best 2 chunks for the prompt.',
+  },
   { id: 'stage-4', number: 4, label: 'Guardrails', concept: 'Input / output checks', description: 'PII masking, injection defense, RAG triad.' },
   { id: 'stage-5', number: 5, label: 'Tool Agent', concept: 'Function calling', description: 'Dynamic tool routing.' },
   { id: 'stage-6', number: 6, label: 'LangGraph', concept: 'Stateful agent', description: 'Cyclic graph with human-in-the-loop.' },
