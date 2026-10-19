@@ -6,6 +6,7 @@ export interface ThreadMessage extends ChatMessage {
   usage?: TokenUsage
   latencyMs?: number
   retrievedContext?: string | null
+  stage?: string
 }
 
 // Holds one conversation thread against one endpoint. The full history is
@@ -47,6 +48,7 @@ export function useChat(path: string) {
             },
             latencyMs: Math.round(performance.now() - started),
             retrievedContext: res.retrieved_context,
+            stage: res.stage,
           },
         ])
       } catch (err) {

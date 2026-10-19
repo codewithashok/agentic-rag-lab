@@ -61,7 +61,15 @@ export const STAGES: Stage[] = [
     description:
       'gpt-4o-mini rewrites the question into 2–3 keyword-dense sub-queries (plus the original). Each runs its own vector search (top-2), results are de-duplicated, and all go into the prompt.',
   },
-  { id: 'stage-5', number: 5, label: 'Tool Agent', concept: 'Function calling', description: 'Dynamic tool routing.' },
+  {
+    id: 'stage-5',
+    number: 5,
+    label: 'Agentic Routing',
+    concept: 'Tool calling',
+    path: '/stage-5/chat',
+    description:
+      'gpt-4o-mini decides per question: answer directly, search the policy (vector search), or look up an order (mock DB: NX-1001, NX-1002, NX-1003). It can call both tools in one turn. Tokens include both LLM calls.',
+  },
   { id: 'stage-6', number: 6, label: 'LangGraph', concept: 'Stateful agent', description: 'Cyclic graph with human-in-the-loop.' },
   { id: 'stage-7', number: 7, label: 'Multi-Agent', concept: 'Supervisor pattern', description: 'Multiple agents with Redis state.' },
 ]
@@ -76,4 +84,6 @@ export const SAMPLE_QUESTIONS = [
   'Can I cancel my order after it is dispatched?',
   'What happens if delivery fails 3 times on a prepaid order?',
   'Do you offer international shipping?',
+  'Where is my order NX-1002 and will I be charged anything?',
+  'Hi there!',
 ]

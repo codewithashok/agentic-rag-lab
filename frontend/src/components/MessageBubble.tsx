@@ -1,10 +1,12 @@
 import type { ThreadMessage } from '../hooks/useChat'
 
 export function MessageBubble({ message }: { message: ThreadMessage }) {
-  const { role, content, usage, latencyMs, retrievedContext } = message
+  const { role, content, usage, latencyMs, retrievedContext, stage } = message
 
   return (
     <div className={`message message--${role}`}>
+      {/* The backend's own label for how it answered, e.g. which tools an agent called. */}
+      {stage && <div className="message__stage">{stage.replace(/^Stage \d+:\s*/, '')}</div>}
       <div className="message__bubble">{content}</div>
       {usage && (
         <div className="message__meta" title="Prompt tokens include the system prompt, any injected context and the whole history.">
