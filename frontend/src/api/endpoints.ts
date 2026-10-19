@@ -9,6 +9,9 @@ export interface Stage {
   concept: string
   description: string
   path?: string
+  // Stages built on a different document get their own sample questions.
+  samples?: string[]
+  placeholder?: string
 }
 
 export interface ChatStage extends Stage {
@@ -87,6 +90,24 @@ export const STAGES: Stage[] = [
     path: '/stage-7/chat',
     description:
       'An LCEL chain (prompt | gpt-4o-mini with structured output) returns a Pydantic object: topic, risk level, actionable flag, reply and follow-ups. No retrieval: answers come from the model alone. Tokens are not reported (0).',
+  },
+  {
+    id: 'stage-8',
+    number: 8,
+    label: 'PDF Ingestion',
+    concept: 'Section-aware chunks + citations',
+    path: '/stage-8/chat',
+    description:
+      'New document: everyday_business_banking_guide.pdf. Parsed page by page with pypdf, split at numbered section headers, each chunk tagged with page + section. Top-2 chunks go into the prompt and the answer cites Page and Section.',
+    samples: [
+      'Who can approve a payment?',
+      'What fees might apply to a payment?',
+      'When are payments processed?',
+      'What happens if a payment looks suspicious?',
+      'What should we do if we see an unauthorized payment?',
+      'What is the COD fee?',
+    ],
+    placeholder: 'Ask about payments, approvals, fees…',
   },
 ]
 

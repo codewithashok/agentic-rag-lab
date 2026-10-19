@@ -5,9 +5,15 @@ interface ComposerProps {
   onSend: (text: string) => void
   busy: boolean
   placeholder?: string
+  samples?: string[]
 }
 
-export function Composer({ onSend, busy, placeholder = 'Ask about shipping, COD, cancellations…' }: ComposerProps) {
+export function Composer({
+  onSend,
+  busy,
+  placeholder = 'Ask about shipping, COD, cancellations…',
+  samples = SAMPLE_QUESTIONS,
+}: ComposerProps) {
   const [text, setText] = useState('')
 
   const submit = (value: string) => {
@@ -32,7 +38,7 @@ export function Composer({ onSend, busy, placeholder = 'Ask about shipping, COD,
   return (
     <div className="composer">
       <div className="composer__samples">
-        {SAMPLE_QUESTIONS.map((q) => (
+        {samples.map((q) => (
           <button key={q} type="button" className="chip" onClick={() => submit(q)} disabled={busy}>
             {q}
           </button>

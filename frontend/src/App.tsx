@@ -18,6 +18,7 @@ function App() {
 
   const visible = page === COMPARE ? CHAT_STAGES : CHAT_STAGES.filter((s) => s.id === page)
   const busy = visible.some((s) => loadingById[s.id])
+  const currentStage = CHAT_STAGES.find((s) => s.id === page)
 
   // On the Compare page the same message goes to every live stage at once.
   const sendToVisible = (text: string) => {
@@ -86,7 +87,8 @@ function App() {
         <Composer
           onSend={sendToVisible}
           busy={busy}
-          placeholder={page === COMPARE ? 'Send the same question to every stage…' : undefined}
+          placeholder={page === COMPARE ? 'Send the same question to every stage…' : currentStage?.placeholder}
+          samples={currentStage?.samples}
         />
       </div>
     </div>
