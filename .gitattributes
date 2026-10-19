@@ -1,0 +1,2 @@
+# Treat PDFs as binary so core.autocrlf never rewrites their bytes
+*.pdf binary
