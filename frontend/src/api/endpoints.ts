@@ -18,6 +18,16 @@ export interface ChatStage extends Stage {
   path: string
 }
 
+// Questions for the banking-guide PDF stages (8+), plus one that isn't in it.
+const BANKING_QUESTIONS = [
+  'Who can approve a payment?',
+  'What fees might apply to a payment?',
+  'When are payments processed?',
+  'What happens if a payment looks suspicious?',
+  'What should we do if we see an unauthorized payment?',
+  'What is the COD fee?',
+]
+
 export const STAGES: Stage[] = [
   {
     id: 'stage-0',
@@ -99,14 +109,18 @@ export const STAGES: Stage[] = [
     path: '/stage-8/chat',
     description:
       'New document: everyday_business_banking_guide.pdf. Parsed page by page with pypdf, split at numbered section headers, each chunk tagged with page + section. Top-2 chunks go into the prompt and the answer cites Page and Section.',
-    samples: [
-      'Who can approve a payment?',
-      'What fees might apply to a payment?',
-      'When are payments processed?',
-      'What happens if a payment looks suspicious?',
-      'What should we do if we see an unauthorized payment?',
-      'What is the COD fee?',
-    ],
+    samples: BANKING_QUESTIONS,
+    placeholder: 'Ask about payments, approvals, fees…',
+  },
+  {
+    id: 'stage-9',
+    number: 9,
+    label: 'Postgres + pgvector',
+    concept: 'SQL filter + vector search',
+    path: '/stage-9/chat',
+    description:
+      'Same banking PDF chunks, now stored in PostgreSQL (Docker) with a vector(1536) column and HNSW index. One SQL query filters by tenant_id and orders by cosine distance, top-2. Answers cite Page and Section.',
+    samples: BANKING_QUESTIONS,
     placeholder: 'Ask about payments, approvals, fees…',
   },
 ]
