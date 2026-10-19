@@ -79,7 +79,15 @@ export const STAGES: Stage[] = [
     description:
       'Retrieves the top-3 chunks, then gpt-4o-mini grades each one YES/NO for relevance. Only passing chunks reach the prompt; if none pass, it skips generation and returns a fixed "contact support" reply. Tokens include the grader calls.',
   },
-  { id: 'stage-7', number: 7, label: 'Multi-Agent', concept: 'Supervisor pattern', description: 'Multiple agents with Redis state.' },
+  {
+    id: 'stage-7',
+    number: 7,
+    label: 'LangChain Core',
+    concept: 'LCEL + structured output',
+    path: '/stage-7/chat',
+    description:
+      'An LCEL chain (prompt | gpt-4o-mini with structured output) returns a Pydantic object: topic, risk level, actionable flag, reply and follow-ups. No retrieval: answers come from the model alone. Tokens are not reported (0).',
+  },
 ]
 
 export const CHAT_STAGES: ChatStage[] = STAGES.filter((s): s is ChatStage => Boolean(s.path))

@@ -14,6 +14,7 @@ from app.stages.stage_3_hybrid_rerank.router import router as stage_3_router
 from app.stages.stage_4_query_transform.router import router as stage_4_router
 from app.stages.stage_5_agentic_routing.router import router as stage_5_router
 from app.stages.stage_6_self_rag.router import router as stage_6_router
+from app.stages.stage_7_langchain_core.router import router as stage_7_router
 
 app = FastAPI(
     title="Agentic RAG Lab API",
@@ -37,6 +38,7 @@ app.include_router(stage_3_router, prefix="/api")
 app.include_router(stage_4_router, prefix="/api")
 app.include_router(stage_5_router, prefix="/api")
 app.include_router(stage_6_router, prefix="/api")
+app.include_router(stage_7_router, prefix="/api")
 
 @app.get("/")
 def health_check():
@@ -49,6 +51,7 @@ def health_check():
             "/api/stage-3/chat",
             "/api/stage-4/chat",
             "/api/stage-5/chat",
-            "/api/stage-6/chat"
+            "/api/stage-6/chat",
+            "/api/stage-7/chat"
         ]
     }

@@ -98,3 +98,5 @@ websocket-client==1.9.2
 websockets==16.1.1
 yarl==1.25.1
 zipp==4.1.1
+langchain-core>=0.2.0
+langchain-openai>=0.1.0

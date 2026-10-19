@@ -4,9 +4,11 @@ import { ChatPanel, type ChatPanelHandle } from './components/ChatPanel'
 import { Composer } from './components/Composer'
 
 const COMPARE = 'compare'
+// Compare view is hidden for now; flip to true to bring it back.
+const SHOW_COMPARE = false
 
 function App() {
-  const [page, setPage] = useState<string>(COMPARE)
+  const [page, setPage] = useState<string>(SHOW_COMPARE ? COMPARE : CHAT_STAGES[0].id)
   const [loadingById, setLoadingById] = useState<Record<string, boolean>>({})
   const panels = useRef<Record<string, ChatPanelHandle | null>>({})
 
@@ -30,17 +32,19 @@ function App() {
           <p className="sidenav__subtitle">Nexus Retail shipping assistant</p>
         </div>
         <nav className="sidenav__list" aria-label="Stages">
-          <button
-            type="button"
-            className={`navitem ${page === COMPARE ? 'navitem--active' : ''}`}
-            onClick={() => setPage(COMPARE)}
-          >
-            <span className="navitem__num">⇆</span>
-            <span className="navitem__text">
-              <span className="navitem__label">Compare</span>
-              <span className="navitem__concept">All live stages side by side</span>
-            </span>
-          </button>
+          {SHOW_COMPARE && (
+            <button
+              type="button"
+              className={`navitem ${page === COMPARE ? 'navitem--active' : ''}`}
+              onClick={() => setPage(COMPARE)}
+            >
+              <span className="navitem__num">⇆</span>
+              <span className="navitem__text">
+                <span className="navitem__label">Compare</span>
+                <span className="navitem__concept">All live stages side by side</span>
+              </span>
+            </button>
+          )}
           {STAGES.map((s) => {
             const live = Boolean(s.path)
             return (
