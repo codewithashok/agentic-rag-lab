@@ -70,7 +70,15 @@ export const STAGES: Stage[] = [
     description:
       'gpt-4o-mini decides per question: answer directly, search the policy (vector search), or look up an order (mock DB: NX-1001, NX-1002, NX-1003). It can call both tools in one turn. Tokens include both LLM calls.',
   },
-  { id: 'stage-6', number: 6, label: 'LangGraph', concept: 'Stateful agent', description: 'Cyclic graph with human-in-the-loop.' },
+  {
+    id: 'stage-6',
+    number: 6,
+    label: 'Self-RAG',
+    concept: 'Chunk grading + fallback',
+    path: '/stage-6/chat',
+    description:
+      'Retrieves the top-3 chunks, then gpt-4o-mini grades each one YES/NO for relevance. Only passing chunks reach the prompt; if none pass, it skips generation and returns a fixed "contact support" reply. Tokens include the grader calls.',
+  },
   { id: 'stage-7', number: 7, label: 'Multi-Agent', concept: 'Supervisor pattern', description: 'Multiple agents with Redis state.' },
 ]
 
