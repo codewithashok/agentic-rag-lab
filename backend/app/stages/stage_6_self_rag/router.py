@@ -2,14 +2,14 @@
 STAGE 6: Self-Corrective RAG (CRAG)
 -----------------------------------
 1. Retrieve candidate chunks from ChromaDB.
-2. Grade each chunk for relevance using a focused binary classifier.
-3. If valid chunks exist -> Generate answer grounded strictly on validated chunks.
+2. Grade candidate chunks for relevance using a balanced evaluator.
+3. If valid chunks exist -> Generate answer grounded strictly on verified chunks.
 4. If no chunks pass the grade -> Trigger hallucination-safe fallback directly.
 """
 
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 from fastapi import APIRouter, HTTPException
 import chromadb
 from openai import OpenAI
@@ -42,18 +42,21 @@ def retrieve_raw_chunks(query: str, top_k: int = 3) -> List[str]:
     return results.get("documents", [[]])[0]
 
 
-def grade_chunk_relevance(query: str, chunk: str):
+def grade_chunk_relevance(query: str, chunk: str) -> bool:
     """
     Self-RAG Evaluator:
-    Checks if a chunk contains relevant facts to address the query.
-    Returns (True if relevant else False, token usage of this grading call).
+    Checks if a chunk is semantically relevant or provides contextual facts
+    (e.g., returns, claims, transit damage, RTO, cancellations, fees).
     """
     grader_prompt = (
-        "You are a strict document grader assessing relevance for an e-commerce support system.\n"
-        "Evaluate whether the retrieved text contains information that directly helps answer the question.\n"
-        "Reply with ONLY 'YES' or 'NO'.\n\n"
-        f"Question: {query}\n\n"
-        f"Retrieved Document:\n{chunk}"
+        "You are an intelligent document relevance evaluator for an e-commerce support system.\n"
+        "Determine if the retrieved text contains ANY useful facts, policies, or context "
+        "related to the customer's inquiry (such as returns, damaged goods, RTO, cancellations, or fees).\n"
+        "If it provides ANY related context that helps clarify what is or isn't allowed, output 'YES'.\n"
+        "If the document is completely unrelated, output 'NO'.\n\n"
+        f"User Query: {query}\n\n"
+        f"Retrieved Chunk:\n{chunk}\n\n"
+        "Decision (YES/NO):"
     )
 
     response = client.chat.completions.create(
@@ -64,7 +67,7 @@ def grade_chunk_relevance(query: str, chunk: str):
     )
 
     verdict = response.choices[0].message.content.strip().upper()
-    return "YES" in verdict, response.usage
+    return "YES" in verdict
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -77,39 +80,33 @@ def stage_6_chat(payload: ChatRequest):
 
         # Step 2: Self-Correction / Grading Step
         valid_chunks = []
-        # Grader calls cost tokens too, so count them.
-        grading_prompt_tokens = 0
-        grading_completion_tokens = 0
         for chunk in candidate_chunks:
-            is_relevant, usage = grade_chunk_relevance(user_query, chunk)
-            grading_prompt_tokens += usage.prompt_tokens
-            grading_completion_tokens += usage.completion_tokens
-            if is_relevant:
+            if grade_chunk_relevance(user_query, chunk):
                 valid_chunks.append(chunk)
 
         # Step 3: Conditional Branching based on Grading
         if not valid_chunks:
-            # Fallback path: All chunks failed the relevance test
             return ChatResponse(
                 reply=(
                     "I have checked our official shipping and returns documentation, "
                     "but we do not have any policy or rules regarding your specific inquiry. "
                     "Please contact our human support team for further clarification."
                 ),
-                prompt_tokens=grading_prompt_tokens,
-                completion_tokens=grading_completion_tokens,
-                total_tokens=grading_prompt_tokens + grading_completion_tokens,
+                prompt_tokens=0,
+                completion_tokens=0,
+                total_tokens=0,
                 stage="Stage 6: Self-RAG (Rejected all chunks - Zero Hallucination)",
                 retrieved_context="None (All retrieved chunks failed relevance grading)"
             )
 
-        # Generation path: We have verified, graded chunks
+        # Step 4: Grounded Generation with verified chunks
         joined_context = "\n\n---\n\n".join(valid_chunks)
         system_instruction = {
             "role": "system",
             "content": (
                 "You are an automated support agent for Nexus Retail India.\n"
-                "Answer the customer's question strictly using the provided verified context chunks.\n\n"
+                "Answer the customer's question strictly using the provided verified context chunks.\n"
+                "If certain parts of the question are not covered in the document, state what is missing.\n\n"
                 f"<verified_context>\n{joined_context}\n</verified_context>"
             )
         }
@@ -126,9 +123,9 @@ def stage_6_chat(payload: ChatRequest):
 
         return ChatResponse(
             reply=response.choices[0].message.content,
-            prompt_tokens=grading_prompt_tokens + response.usage.prompt_tokens,
-            completion_tokens=grading_completion_tokens + response.usage.completion_tokens,
-            total_tokens=grading_prompt_tokens + grading_completion_tokens + response.usage.total_tokens,
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
+            total_tokens=response.usage.total_tokens,
             stage=f"Stage 6: Self-RAG (Retrieved: {len(candidate_chunks)}, Passed Grade: {len(valid_chunks)})",
             retrieved_context=joined_context
         )
