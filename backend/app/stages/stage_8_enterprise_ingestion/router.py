@@ -30,15 +30,18 @@ COLLECTION_NAME = "everyday_banking_guide_stage_8"
 # converting the PDF into structured chunks with metadata, embedding them, and storing in ChromaDB.
 def get_or_create_collection():
     """Initializes ChromaDB and auto-indexes the PDF if the collection is empty."""
+    # Initialize ChromaDB client with persistent storage
     chroma_client = chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
 
     try:
+        # if the collection already exists and has data, return it
         col = chroma_client.get_collection(name=COLLECTION_NAME)
         if col.count() > 0:
             return col
     except Exception:
         pass
 
+    # If collection doesn't exist or is empty, create it and ingest the PDF
     col = chroma_client.get_or_create_collection(
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"}
@@ -47,15 +50,16 @@ def get_or_create_collection():
     if col.count() == 0:
         if not PDF_PATH.exists():
             raise FileNotFoundError(f"PDF not found at {PDF_PATH}. Please save the file first.")
-
+        # Read the text from PDF file page-by-page and extract raw text with page numbers
         pages = parse_banking_guide_pdf(PDF_PATH)
+        # Split the text into clean chunks bounded by numbered section titles and enrich with metadata
         chunks = chunk_banking_guide(pages)
 
         texts = [c["text"] for c in chunks]
         ids = [c["chunk_id"] for c in chunks]
         metas = [c["metadata"] for c in chunks]
 
-        # Generate embeddings
+        # Generate embeddings for the chunks using OpenAI's embedding model and store them in ChromaDB
         emb_res = client.embeddings.create(
             model="text-embedding-3-small",
             input=texts
@@ -90,7 +94,7 @@ def stage_8_chat(payload: ChatRequest):
             query_embeddings=[query_vector],
             n_results=2
         )
-
+        # matched_docs and matched_metas are lists of the top 2 retrieved documents and their metadata
         matched_docs = results.get("documents", [[]])[0]
         matched_metas = results.get("metadatas", [[]])[0]
 
