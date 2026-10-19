@@ -61,6 +61,15 @@ compliance_prompt = ChatPromptTemplate.from_messages([
 # 4. Build Structured LCEL Chain
 # Prompt -> LLM (bound to Pydantic Schema) -> Validated Pydantic Instance
 structured_chain = compliance_prompt | llm.with_structured_output(PolicyComplianceAssessment)
+# sample output of structured_chain is: 
+# PolicyComplianceAssessment(
+#     query_topic="Shipping SLA",
+#     is_actionable=True,
+#     risk_level="LOW",
+#     customer_response="Your shipping inquiry falls under our standard policies.",
+#     suggested_followups=["Check your tracking information.", "Contact our customer service for further assistance."]
+# )
+
 
 
 @router.post("/chat", response_model=ChatResponse)
