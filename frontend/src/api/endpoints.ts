@@ -134,6 +134,23 @@ export const STAGES: Stage[] = [
     samples: BANKING_QUESTIONS,
     placeholder: 'Ask about payments, approvals, fees…',
   },
+  {
+    id: 'stage-11',
+    number: 11,
+    label: 'LangGraph Agent',
+    concept: 'Stateful tool loop',
+    path: '/stage-11/chat',
+    description:
+      'A LangGraph state machine: agent node → tools node → back to agent, until no more tool calls (max 5 loops). Tools: search_banking_policy (Stage 10 hybrid search) and fetch_account_balance (mock ledger: ACC-9901, ACC-1002). "Retrieved context" shows the tool trace.',
+    samples: [
+      'Hello!',
+      'What fees might apply to a payment?',
+      'What is the balance of ACC-1002?',
+      "Why can't I use my account ACC-9901, and what does the guide say about suspicious payments?",
+      'Check ACC-0000',
+    ],
+    placeholder: 'Ask about policies or an account (ACC-9901, ACC-1002)…',
+  },
 ]
 
 export const CHAT_STAGES: ChatStage[] = STAGES.filter((s): s is ChatStage => Boolean(s.path))
