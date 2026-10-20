@@ -123,6 +123,17 @@ export const STAGES: Stage[] = [
     samples: BANKING_QUESTIONS,
     placeholder: 'Ask about payments, approvals, fees…',
   },
+  {
+    id: 'stage-10',
+    number: 10,
+    label: 'Postgres Hybrid + Rerank',
+    concept: 'pgvector + tsvector + RRF',
+    path: '/stage-10/chat',
+    description:
+      'One SQL query runs vector search (HNSW, top-5) and full-text search (tsvector, top-5) inside PostgreSQL and fuses them with RRF into 6 candidates. gpt-4o-mini scores each 0–100 and the best 2 go into the prompt with Page/Section citations.',
+    samples: BANKING_QUESTIONS,
+    placeholder: 'Ask about payments, approvals, fees…',
+  },
 ]
 
 export const CHAT_STAGES: ChatStage[] = STAGES.filter((s): s is ChatStage => Boolean(s.path))
