@@ -21,6 +21,9 @@ def execute_guarded_agent_pipeline(raw_user_query: str) -> Dict[str, Any]:
     4. Post-flight De-anonymization & Safety Validation
     """
     # 1. Pre-Flight Security Check
+    # Here we inspect the raw user query for any malicious patterns or system-level instructions.
+    # is_threat: True if the input is malicious, False otherwise.
+    # threat_reason: Explanation of why the input was flagged, if applicable.
     is_threat, threat_reason = InjectionShield.inspect(raw_user_query)
     if is_threat:
         return {
