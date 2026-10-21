@@ -151,6 +151,22 @@ export const STAGES: Stage[] = [
     ],
     placeholder: 'Ask about policies or an account (ACC-9901, ACC-1002)…',
   },
+  {
+    id: 'stage-12',
+    number: 12,
+    label: 'Multi-Agent',
+    concept: 'Supervisor + Maker-Checker',
+    path: '/stage-12/chat',
+    description:
+      'A supervisor routes to an account specialist (mock ledger) and a policy specialist (Stage 10 hybrid search). A maker drafts the reply and a compliance checker approves or rejects it (max 3 drafts). "Retrieved context" shows the audit status, feedback and maker iterations. Slow: many LLM calls.',
+    samples: [
+      'Why is my account ACC-9901 frozen and how do I release funds?',
+      'What is the balance of ACC-1002?',
+      'What fees might apply to a payment?',
+      'What is the balance of account ACC-0000?',
+    ],
+    placeholder: 'Ask about an account (ACC-9901, ACC-1002) or a policy…',
+  },
 ]
 
 export const CHAT_STAGES: ChatStage[] = STAGES.filter((s): s is ChatStage => Boolean(s.path))

@@ -19,6 +19,7 @@ from app.stages.stage_8_enterprise_ingestion.router import router as stage_8_rou
 from app.stages.stage_9_postgres_pgvector.router import router as stage_9_router
 from app.stages.stage_10_hybrid_pgvector.router import router as stage_10_router
 from app.stages.stage_11_langgraph_agent.router import router as stage_11_router
+from app.stages.stage_12_multi_agent.router import router as stage_12_router
 
 app = FastAPI(
     title="Agentic RAG Lab API",
@@ -47,6 +48,7 @@ app.include_router(stage_8_router, prefix="/api")
 app.include_router(stage_9_router, prefix="/api")
 app.include_router(stage_10_router, prefix="/api")
 app.include_router(stage_11_router, prefix="/api")
+app.include_router(stage_12_router, prefix="/api")
 
 @app.get("/")
 def health_check():
