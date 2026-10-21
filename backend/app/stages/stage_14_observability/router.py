@@ -40,13 +40,24 @@ def stage_14_chat(payload: ChatRequest):
 
         # Consolidate Telemetry
         telemetry = tracer.get_summary()
-        
+
+        # None means the evaluator didn't run: show it as unmeasured, never as a score.
+        def score_display(key: str) -> str:
+            value = eval_scores.get(key)
+            return f"{value:.3f}" if value is not None else "NOT_MEASURED (Evaluator Offline)"
+
+        eval_error_line = (
+            f"Evaluator Error: {eval_scores['eval_error']}\n"
+            if eval_scores.get("eval_status") == "SKIPPED" else ""
+        )
+
         telemetry_display = (
             f"Trace ID: {telemetry['trace_id']} | Total Time: {telemetry['total_latency_ms']} ms\n"
             f"Spans Recorded: {telemetry['step_count']}\n"
             f"--- Ragas Quality Scores ---\n"
-            f"Faithfulness (Grounding): {eval_scores.get('faithfulness', 'N/A')}\n"
-            f"Answer Relevance: {eval_scores.get('answer_relevancy', 'N/A')}\n"
+            f"Faithfulness (Grounding): {score_display('faithfulness')}\n"
+            f"Answer Relevance: {score_display('answer_relevancy')}\n"
+            f"{eval_error_line}"
             f"--- Audit Trail ---\n"
             f"{pipeline_result.get('audit_trail', 'None')}"
         )

@@ -21,10 +21,10 @@ def evaluate_rag_turn(
     question: str,
     answer: str,
     contexts: List[str]
-) -> Dict[str, float]:
+) -> Dict[str, Any]:
     """
     Evaluates a single generation turn using Ragas metric primitives.
-    Returns scores bounded between 0.0 and 1.0.
+    Returns scores bounded between 0.0 and 1.0, or None when the evaluator could not run.
     """
     try:
         # Imported lazily: ragas can't be installed alongside openai 3.x (jiter conflict),
@@ -53,9 +53,11 @@ def evaluate_rag_turn(
             "answer_relevancy": round(float(results["answer_relevancy"]), 3)
         }
     except Exception as e:
-        # Safe fallback in offline/rate-limited environments
+        # Report "not measured" (None -> JSON null), never a fake score:
+        # 1.0 hides hallucinations behind green dashboards, 0.0 corrupts accuracy baselines.
         return {
-            "faithfulness": 1.0,
-            "answer_relevancy": 1.0,
-            "eval_note": f"Evaluator bypassed: {str(e)}"
+            "faithfulness": None,
+            "answer_relevancy": None,
+            "eval_status": "SKIPPED",
+            "eval_error": str(e)
         }
